@@ -1,129 +1,159 @@
 from collections import deque as queue
-import heapq
+
 
 class Graph:
-    fringeDFS = list()
-    fringeGreedy, fringeAStar, fringeUCS = [], [], []
-    Visited = set()
-    goals = []
+
     def __init__(self, edges, costs, goals):
+        self.graph_dict = {}
         self.edges = edges
         self.costs = costs
-        self.graph_dict = {}
         self.goals = goals
+        self.heuristic_dict = {}
         for start, end in edges:
             if start not in self.graph_dict:
                 self.graph_dict[start] = [end]
             else:
                 self.graph_dict[start].append(end)
 
-    def checkGoal(self, node):
-        return True if node in [element for element in self.goals] else False
-    def expandBFS(self, node, path):
-        neighbours = self.graph_dict.get(str(node),[])
-        newPath = [path + [element] for element in neighbours]
-        return newPath
+    def check_goal(self, node):
+        return True if node in self.goals else False
+
+    def expand_bfs(self, node, path):
+        neighbours = self.graph_dict.get(str(node), [])
+        new_path = [path + [element] for element in neighbours]
+        return new_path
 
     def bfs(self, start):
-        self.Visited = set()
-        fringe = queue([[start]])
+        visited, fringe = set(), queue([[start]])
         while fringe:
-            # print([element for element in fringe])
             path = fringe.popleft()
             node = path[-1]
-            if self.checkGoal(node):
+            if self.check_goal(node):
                 return path
             else:
-                if tuple(node) not in self.Visited:
-                    self.Visited.add(tuple(node))
-                    fringe.extend(self.expandBFS(node, path))
-        return False
-    def expandDFS(self, node, path):
-        neighbours = self.graph_dict.get(str(node), [])
-        newPath = [path + [element] for element in neighbours]
-        return newPath
+                if tuple(node) not in visited:
+                    visited.add(tuple(node))
+                    fringe.extend(self.expand_bfs(node, path))
+        return None
 
+    def expand_dfs(self, node, path):
+        neighbours = self.graph_dict.get(str(node), [])
+        new_path = [path + [element] for element in neighbours]
+        return new_path
 
     def dfs(self, start):
-        self.Visited = set()
-        fringe = list([[start]])
+        visited, fringe = set(), list([[start]])
         while fringe:
             path = fringe.pop()
             node = path[-1]
-            if self.checkGoal(node):
+            if self.check_goal(node):
                 return path
             else:
-                if tuple(node) not in self.Visited:
-                    self.Visited.add(tuple(node))
-                    fringe.extend(self.expandDFS(node, path))
-        return False
+                if tuple(node) not in visited:
+                    visited.add(tuple(node))
+                    fringe.extend(self.expand_dfs(node, path))
+        return None
 
-    def calcHeuristic(self, graph):
-        pass
+    def heuristic(self, current_node):
+        if current_node in self.heuristic_dict:
+            return self.heuristic_dict[current_node]
+        if self.check_goal(current_node):
+            heuristic_value = 0
+        else:
+            cumulative_cost = 0
+            node = current_node
+            while node not in self.goals:
+                neighbors = self.graph_dict.get(str(node), [])
+                if not neighbors:
+                    return float('inf')
+                next_node, _ = min(
+                    [(neighbor, self.costs.get((node, neighbor), float('inf')) + self.heuristic(neighbor))
+                     for neighbor in neighbors],
+                    key=lambda x: x[1]
+                )
+                cumulative_cost += self.costs.get((node, next_node), 0)
+                node = next_node
+            heuristic_value = cumulative_cost
+        self.heuristic_dict[current_node] = heuristic_value
+        return heuristic_value
 
-    def expandGreedy(self, node):
-        # add nodes to fringe here
-        pass
+    def expand_greedy(self, node, path):
+        neighbours = self.graph_dict.get(str(node), [])
+        new_path = [(self.heuristic_dict[element], [i for i in path] + [element]) for element in neighbours]
+        return new_path
 
     def greedy(self, start):
-        self.Visited = set()
-        self.calcHeuristic(start)
+        self.heuristic(start)
+        visited, fringe, path = set(), [], []
         node = start
-        heapq.heappush(self.fringeGreedy,node)
-        while self.fringeGreedy:
-            node = heapq.heappop(self.fringeGreedy)
-            if self.checkGoal(node):
-                return node
+        fringe.append((self.heuristic_dict[node], node))
+        while fringe:
+            h, node = min(fringe)
+            fringe.remove((h, node))
+            path = node
+            node = node[-1]
+            if self.check_goal(node):
+                return path
             else:
-                if node not in self.Visited:
-                    self.Visited.add(node)
-                    self.expandGreedy(node)
-        return False
+                if tuple(node) not in visited:
+                    visited.add(tuple(node))
+                    fringe.extend(self.expand_greedy(node, path))
+        return None
 
-    def expandAStar(self, node):
-        # add nodes to fringe here
-        pass
+    def expand_astar(self, node, path):
+        neighbours = self.graph_dict.get(str(node), [])
+        new_path = [(self.heuristic_dict[element] + self.path_cost(path) + self.costs.get((node, element)), [i for i in path] + [element]) for element in neighbours]
+        return new_path
 
-    def AStar(self, start):
-        self.Visited = set()
-        self.calcHeuristic(start)
+    def astar(self, start):
+        self.heuristic(start)
+        visited, fringe, path = set(), [], []
         node = start
-        heapq.heappush(self.fringeAStar,node)
-        while self.fringeAStar:
-            node = heapq.heappop(self.fringeAStar)
-            if self.checkGoal(node):
-                return node
+        fringe.append((self.heuristic_dict[node] + 0, node))
+        while fringe:
+            h, node = min(fringe)
+            fringe.remove((h, node))
+            path = node
+            node = node[-1]
+            if self.check_goal(node):
+                return path
             else:
-                if node not in self.Visited:
-                    self.Visited.add(node)
-                    self.expandAStar(node)
-        return False
+                if tuple(node) not in visited:
+                    visited.add(tuple(node))
+                    fringe.extend(self.expand_astar(node, path))
+        return None
 
-
-    def expandUCS(self, node):
-        lst = []
-        return lst
+    def path_cost(self, path):
+        return sum(self.costs.get((path[i], path[i + 1]), 1) for i in range(len(path) - 1))
 
     def ucs(self, start):
-        self.Visited = set()
-        node = start
-        heapq.heappush(self.fringeUCS, node)
-        while self.fringeUCS:
-            node = heapq.heappop(self.fringeUCS)
-            if self.checkGoal(node):
-                return node
+        visited, fringe = set(), [(0, start, [])]
+        while fringe:
+            cost, node, path = min(fringe, key=lambda x: x[0])
+            fringe.remove((cost, node, path))
+            if self.check_goal(node):
+                return path + [node]
             else:
-                if node not in self.Visited:
-                    self.Visited.add(node)
-                    self.expandUCS(node)
-        return False
+                if node not in visited:
+                    visited.add(node)
+                    for neighbor in self.graph_dict.get(node, []):
+                        edge = (node, neighbor)
+                        new_cost = cost + self.costs.get(edge, 1)
+                        new_path = path + [node]
+                        fringe.append((new_cost, neighbor, new_path))
+        return None
+
+
 
 edges = [("A", "B"), ("A", "C"), ("B", "D"), ("C", "D"), ("D", "E"), ("E", "G"), ("D", "G")]
 costs = {("A", "B"): 1, ("A", "C"): 4, ("B", "D"): 2, ("C", "D"): 1, ("D", "E"): 5, ("E", "G"): 2, ("D", "G"): 1}
-g = Graph(edges, costs,["G"])
+g = Graph(edges, costs, ["G"])
 
-bfsPath = g.bfs("A")
-dfsPath = g.dfs("A")
-print("BFS Path: ", bfsPath)
-print("DFS Path: ", dfsPath)
+# bfsPath = g.bfs("A")
+# print("BFS Path: ", bfsPath)
 
+# dfsPath = g.dfs("A")
+# print("DFS Path: ", dfsPath)
+print(g.astar("A"))
+# print(g.graph_dict)
+# print(g.path_cost(["A", "B", "D", "E"]))

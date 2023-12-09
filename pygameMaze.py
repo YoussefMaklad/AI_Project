@@ -1,6 +1,6 @@
 import pygame
 from colors import *
-
+from collections import deque as queue
 
 class Cell:
     def __init__(self, row, col, width, height, total_rows, total_cols):
@@ -14,7 +14,6 @@ class Cell:
         self.y = col * height
         self.color = WHITE
         self.neighbours = []
-
     def get_pos(self):
         return self.row, self.col
 
@@ -43,8 +42,7 @@ class Cell:
         self.color = RED
 
     def make_explored(self):
-        self.color = GREEN
-
+        self.color = GREY
     def make_start(self):
         self.color = LABANY
 
@@ -57,26 +55,25 @@ class Cell:
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
 
-    def expand(self, maze):
-        self.neighbours = []
-        if self.row < self.total_rows - 1 and not maze[self.row + 1][self.col].is_obstacle(): # down
-            self.neighbours.append(maze[self.row + 1][self.col])
-
-        if self.row > 0 and not maze[self.row - 1][self.col].is_obstacle(): # up
-            self.neighbours.append(maze[self.row - 1][self.col])
-
-        if self.col > 0 and not maze[self.row][self.col - 1].is_obstacle(): # left
-            self.neighbours.append(maze[self.row][self.col - 1])
-
-        if self.col < self.total_cols - 1 and not maze[self.row][self.col + 1].is_obstacle(): # right
-            self.neighbours.append(maze[self.row][self.col + 1])
-
 
 class MazeManager:
     def __init__(self):
         self.fringe = []
         self.visited = set()
+    def expand(self, maze, cell):
+        cell.neighbours = []
+        if cell.row < cell.total_rows - 1 and not maze[cell.row + 1][cell.col].is_obstacle(): # down
+            cell.neighbours.append(maze[cell.row + 1][cell.col])
 
+        if cell.row > 0 and not maze[cell.row - 1][cell.col].is_obstacle(): # up
+            cell.neighbours.append(maze[cell.row - 1][cell.col])
+
+        if cell.col > 0 and not maze[cell.row][cell.col - 1].is_obstacle(): # left
+            cell.neighbours.append(maze[cell.row][cell.col - 1])
+
+        if cell.col < cell.total_cols - 1 and not maze[cell.row][cell.col + 1].is_obstacle(): # right
+            cell.neighbours.append(maze[cell.row][cell.col + 1])
+        return cell.neighbours
     def create_maze(self, rows, cols, width, height):
         maze = []
         gap_row = width // rows
@@ -111,10 +108,63 @@ class MazeManager:
         row = y // gap_row
         col = x // gap_col
         return row, col
-
-    def astar(self, draw_scene, maze, start, goal):
+    def bfs(self, maze, start: Cell, goals):
+        fringe, visited, path = queue(), set(), []
+        paths_dict = {start: None}  # Dictionary to track paths
+        fringe.append(start)
+        while fringe:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
+            node = fringe.popleft()
+            if node in goals:
+                path = self.get_path_to_goal(node, paths_dict)
+                return path
+            if node not in visited:
+                visited.add(node)
+                node.make_visited()
+                neighbors = self.expand(maze, node)
+                for neighbor in neighbors:
+                    if neighbor not in visited:
+                        fringe.append(neighbor)
+                        neighbor.make_explored()
+                        paths_dict[neighbor] = node
+            manager.draw_scene(screen, maze, ROWS, COLS, WIDTH, HEIGHT)
+        return None
+    def dfs(self, maze, start, goals):
+        fringe, visited, path = [], set(), []
+        paths_dict = {start: None}
+        fringe.append(start)
+        while fringe:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
+            node = fringe.pop()
+            if node in goals:
+                path = self.get_path_to_goal(node, paths_dict)
+                return path
+            if node not in visited:
+                visited.add(node)
+                node.make_visited()
+                neighbors = self.expand(maze, node)
+                for neighbor in neighbors[::-1]:
+                    if neighbor not in visited:
+                        fringe.append(neighbor)
+                        neighbor.make_explored()
+                        paths_dict[neighbor] = node
+            manager.draw_scene(screen, maze, ROWS, COLS, WIDTH, HEIGHT)
+        return None
+    def get_path_to_goal(self, goal, paths_dict):
+        path, current_node = [], goal
+        while current_node:
+            path.append(current_node)
+            current_node = paths_dict[current_node]
+        path = path[::-1]
+        for current_node in path:
+            current_node.make_path()
+            manager.draw_scene(screen, maze, ROWS, COLS, WIDTH, HEIGHT)
+    def astar(self, maze, start, goals):
         pass
-
 
 WIDTH = HEIGHT = 800
 ROWS = 50
@@ -123,8 +173,8 @@ COLS = 50
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Maze')
-icon = pygame.image.load('maze.png')
-pygame.display.set_icon(icon)
+# icon = pygame.image.load('maze.png')
+# pygame.display.set_icon(icon)
 
 manager = MazeManager()
 maze = manager.create_maze(ROWS, COLS, WIDTH, HEIGHT)
@@ -138,9 +188,9 @@ while True:
             exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                for i in range(ROWS):
-                    for j in range(COLS):
-                        maze[i][j].expand(maze)
+                path = manager.dfs(maze, start, goals)
+                # for cell in path:
+                    # cell.make_path()
         if pygame.mouse.get_pressed()[0]:
             pos = pygame.mouse.get_pos()
             row, col = manager.get_clicked_pos(pos, ROWS, COLS, WIDTH, HEIGHT)

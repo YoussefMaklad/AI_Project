@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from collections import deque as queue
 from cell import Cell
@@ -91,15 +93,26 @@ class MazeManager:
     def dfs(self, start, goals):
         fringe, visited, path = [], set(), []
         paths_dict = {start: None}
-        fringe.append(start)
+        fringe.append([start])
         while fringe:
-            # for cell in fringe:
-            #     print(cell.row, cell.col)
-            # print('------------------------------------------')
+            print("Start:")
+            for lst_1 in fringe:
+                for cell in lst_1:
+                    print(cell.row,cell.col)
+                print("=======================================")
+            print("End\n")
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
-            node = fringe.pop(-1)
+            if fringe[0] == [start]:
+                node = fringe.pop(-1)
+                node = node[0]
+            else:
+                lst = fringe.pop(-1)
+                node = random.choice(lst)
+                lst.remove(node)
+                if len(lst) != 0:
+                    fringe.append(lst)
             if node in goals:
                 self.visualize_path(node, paths_dict)
                 return
@@ -107,12 +120,16 @@ class MazeManager:
                 visited.add(node)
                 node.make_visited()
                 neighbors = self.expand(node)
+                final_neighbour = []
                 for neighbor in neighbors:
                     if neighbor not in visited:
-                        fringe.append(neighbor)
+                        final_neighbour.append(neighbor)
                         neighbor.make_explored()
                         paths_dict[neighbor] = node
+                if len(final_neighbour) > 0:
+                    fringe.append(final_neighbour)
             self.draw_scene()
+            pygame.time.delay(500)
 
     def astar(self, start, goals):
         pass
@@ -174,5 +191,4 @@ class MazeManager:
                         start = None
                     if cell in goals:
                         goals.remove(cell)
-
             pygame.display.update()

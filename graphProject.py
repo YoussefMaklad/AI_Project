@@ -3,7 +3,7 @@ from collections import deque as queue
 
 class Graph:
 
-    def __init__(self, edges, costs, goals):
+    def __init__(self, edges, costs, heuristic, goals):
         self.graph_dict = {}
         self.heuristic_dict = {}
         self.edges = edges
@@ -14,6 +14,8 @@ class Graph:
                 self.graph_dict[start] = [end]
             else:
                 self.graph_dict[start].append(end)
+        for node, value in heuristic.items():
+            self.heuristic_dict[node] = value
 
     def check_goal(self, node):
         return True if node in self.goals else False
@@ -172,8 +174,9 @@ costs = {
     ("E", "G"): 2,
     ("D", "G"): 1
 }
-g = Graph(edges, costs, ["G"])
-
+heuristic = {"A": 10, "B": 10, "C": 10, "D": 10, "E": 10, "G": 0}
+g = Graph(edges, costs, heuristic, ["G"])
+print(g.heuristic_dict)
 # print(g.bfs("A"))
 # print(g.dfs("A"))
 # print(g.ucs("A"))

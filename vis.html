@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="https://kit.fontawesome.com/587d92c94b.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto/newtonsCradle.js"></script>
+  <link rel="stylesheet" type="text/css" href="vis.css" />
+
+  
+</head>
+
+<body>
+  <video id="video-background" autoplay loop muted>
+    <source src="/images/vid.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+  <div class="container">
+    <div class="box">
+      <nav>
+        <l-newtons-cradle class="img" size="78" speed="1.4" color="#068FFF"></l-newtons-cradle>
+        <p class="logo pulsate">Graphy</p>
+        <ul class="nav">
+          <li><a href="Home.html" class="blue">Home</a></li>
+          <li><a href="" class="blue">About</a></li>
+          <li><a href="vis.html" class="blue">Graphs</a></li>
+          <li><a href="" class="blue">Maze</a></li>
+        </ul>
+      </nav>
+      <div id="mynetwork"></div>
+      <div class="buttons">
+        <ul class="nav">
+          <li><button onclick="addNode()" class="light">Add Node</button></li>
+          <li><button onclick="editNode()">Edit Node</button></li>
+          <li><button onclick="deleteSelectedNode()">Delete</button></li>
+          <li><button onclick="editEdge()">Edit Edge</button></li>
+          <li><button onclick="removeSelectedEdge()">Re-Edge</button></li>
+          <li><button onclick="printNodeList()">Print Node</button></li>
+          <li><button onclick="printEdgeList()">Print Edge</button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div id="customAlert" class="custom-alert"></div>
+
+  <!-- Modal for editing node labels -->
+  <div id="myModal" class="modal">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <div class="modal-content">
+      <label for="newLabel">Enter new label for the node:</label>
+      <input type="text" id="newLabel" />
+      <button id="updateBtn" onclick="updateNodeLabel()">Update Label</button>
+    </div>
+  </div>
+
+  <!-- Modal for editing edge labels -->
+  <div id="edgeModal" class="modal">
+    <span class="close" onclick="closeEdgeModal()">&times;</span>
+    <div class="modal-content">
+      <label for="newEdgeLabel">Enter new label for the edge:</label>
+      <input type="text" id="newEdgeLabel" />
+      <button id="updateEdgeBtn" onclick="updateEdgeLabel()">Update Label</button>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var nodes = new vis.DataSet([]);
+    var edges = new vis.DataSet([]);
+    var selectedNodeId = null;
+    var selectedEdgeId = null;
+    var container = document.getElementById("mynetwork");
+
+    var data = {
+      nodes: nodes,
+      edges: edges,
+    };
+
+    var options = {
+    physics: {
+      enabled: false,
+    },
+  };
+    var options = {};
+    var network = new vis.Network(container, data, options);
+
+    function addNode() {
+      var newNodeId = nodes.length + 1;
+      var newNodeLabel = "Node " + newNodeId;
+
+      var nodeFont = {
+        color: "white",
+      };
+      var newNode = {
+        id: newNodeId,
+        label: newNodeLabel,
+        color: "palevioletred",
+        font: nodeFont,
+        size:20,
+      };
+      nodes.add(newNode);
+    }
+
+    network.on("doubleClick", function (params) {
+      if (params.nodes.length > 0) {
+        if (!selectedNodeId) {
+          selectedNodeId = params.nodes[0];
+          customAlert("Source node selected. Now double click on the target node.");
+        } else if (params.nodes[0] !== selectedNodeId) {
+          var connectedNodeId = params.nodes[0];
+          var newEdge = {
+            from: selectedNodeId,
+            to: connectedNodeId,
+            label: "1",
+            color: "#0969b8",
+            width: 5,
+            font: { size: 16 },
+          };
+          edges.add(newEdge);
+          printNodeList();
+          printEdgeList();
+          selectedNodeId = null;
+        }
+      }
+    });
+
+    function editNode() {
+      var selectedNodeId = network.getSelectedNodes()[0];
+      if (selectedNodeId) {
+        // Display the modal
+        document.getElementById("myModal").style.display = "block";
+      } else {
+        customAlert("Please select a node to edit.");
+      }
+    }
+
+    function closeModal() {
+      document.getElementById("myModal").style.display = "none";
+    }
+
+    function updateNodeLabel() {
+      var selectedNodeId = network.getSelectedNodes()[0];
+      var newLabel = document.getElementById("newLabel").value;
+
+      if (selectedNodeId && newLabel.trim() !== "") {
+        nodes.update({ id: selectedNodeId, label: newLabel });
+        // Hide the modal after updating the label
+        closeModal();
+      } else {
+        alert("Invalid input. Please enter a valid label.");
+      }
+    }
+
+    function editEdge() {
+      var selectedEdgeId = network.getSelectedEdges()[0];
+      if (selectedEdgeId) {
+        // Display the modal
+        document.getElementById("edgeModal").style.display = "block";
+      } else {
+        customAlert("Please select an edge to edit.");
+      }
+    }
+
+    function closeEdgeModal() {
+      document.getElementById("edgeModal").style.display = "none";
+    }
+
+    function updateEdgeLabel() {
+      var selectedEdgeId = network.getSelectedEdges()[0];
+      var newEdgeLabel = document.getElementById("newEdgeLabel").value;
+
+      if (selectedEdgeId && newEdgeLabel.trim() !== "") {
+        edges.update({ id: selectedEdgeId, label: newEdgeLabel });
+        // Hide the modal after updating the label
+        closeEdgeModal();
+      } else {
+        alert("Invalid input. Please enter a valid label.");
+      }
+    }
+
+    function customAlert(message) {
+      var customAlertElement = document.getElementById("customAlert");
+      customAlertElement.textContent = message;
+      customAlertElement.style.display = "block";
+
+      setTimeout(function () {
+        customAlertElement.style.display = "none";
+      }, 2000); // Hide after 2 seconds (adjust as needed)
+    }
+
+    function deleteSelectedNode() {
+      var selectedNodeId = network.getSelectedNodes()[0];
+      if (selectedNodeId) {
+        nodes.remove({ id: selectedNodeId });
+        edges.remove({ from: selectedNodeId });
+        edges.remove({ to: selectedNodeId });
+
+        printNodeList();
+        printEdgeList();
+      } else {
+        customAlert("Please select a node to delete.");
+      }
+    }
+
+    function removeSelectedEdge() {
+      var selectedEdgeId = network.getSelectedEdges()[0];
+      if (selectedEdgeId) {
+        edges.remove({ id: selectedEdgeId });
+        printEdgeList();
+      } else {
+        customAlert("Please select an edge to remove.");
+      }
+    }
+
+    function printNodeList() {
+      var nodeListWithLabels = edges.get().map((edge) => ({
+        from: nodes.get(edge.from).label,
+        to: nodes.get(edge.to).label,
+      }));
+      console.log("Node List:", nodeListWithLabels);
+    }
+
+    function printEdgeList() {
+      var edgeListWithLabels = edges.get().map((edge) => ({
+        from: nodes.get(edge.from).label,
+        to: nodes.get(edge.to).label,
+        label: edge.label,
+      }));
+      console.log("Edge List:", edgeListWithLabels);
+    }
+  </script>
+</body>
+
+</html>

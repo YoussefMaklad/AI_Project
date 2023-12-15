@@ -2,7 +2,6 @@ import pygame
 from mazemanager import MazeManager
 from gui import GUI
 
-
 pygame.init()
 
 # pygame.mixer.init()
@@ -13,11 +12,11 @@ pygame.init()
 # pygame.mixer.music.play(-1)
 
 SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-WIDTH, HEIGHT = pygame.display.get_surface().get_size()
-BG = pygame.image.load("BG.jpeg")
 pygame.display.set_caption('Maze')
 icon = pygame.image.load('icon.png')
 pygame.display.set_icon(icon)
+WIDTH, HEIGHT = pygame.display.get_surface().get_size()
+BG = pygame.image.load("BG.jpeg")
 
 gui = GUI(SCREEN, BG, WIDTH, HEIGHT)
 algorithm, rows, cols = gui.main_menu()

@@ -13,7 +13,7 @@ class Button:
 			self.image = self.text
 
 	def update(self, screen):
-		if self.image is not None:
+		if self.image:
 			screen.blit(self.image, self.rect)
 		screen.blit(self.text, self.text_rect)
 

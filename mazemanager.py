@@ -66,17 +66,17 @@ class MazeManager:
         row = x // gap_col
         return row, col
 
-    def __bfs(self, start, goals):
+    def __bfs(self):
         fringe, visited, path = queue(), set(), []
-        paths_dict = {start: None}
-        fringe.append(start)
+        paths_dict = {self.start: None}
+        fringe.append(self.start)
         while fringe:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
 
             cell = fringe.popleft()
-            if cell in goals:
+            if cell in self.goals:
                 self.__visualize_path(cell, paths_dict)
                 return
 
@@ -92,17 +92,17 @@ class MazeManager:
 
             self.__draw_scene()
 
-    def __dfs(self, start, goals):
+    def __dfs(self):
         fringe, visited, path = [], set(), []
-        paths_dict = {start: None}
-        fringe.append([start])
+        paths_dict = {self.start: None}
+        fringe.append([self.start])
         while fringe:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
 
-            if fringe[0] == [start]:
-                cell = fringe.pop(-1)[0]
+            if fringe[0] == [self.start]:
+                cell = fringe.pop()[0]
             else:
                 lst = fringe.pop(-1)
                 cell = random.choice(lst)
@@ -110,7 +110,7 @@ class MazeManager:
                 if len(lst) != 0:
                     fringe.append(lst)
 
-            if cell in goals:
+            if cell in self.goals:
                 self.__visualize_path(cell, paths_dict)
                 return
 
@@ -129,15 +129,59 @@ class MazeManager:
 
             self.__draw_scene()
 
-    def __get_manhattan_distance(self, first_cell, second_cell):
-        x1, y1 = first_cell
-        x2, y2 = second_cell
-        return abs(x1 - x2) + abs(y1 - y2)
+    def __get_manhattan_distance(self, cell):
+        min_distance = float('inf')
+        for goal in self.goals:
+            distance = abs(cell.row - goal.row) + abs(cell.col - goal.col)
+            min_distance = min(min_distance, distance)
+        return min_distance
 
-    def __astar(self, start, goals):
-        pass
+    def __calc_heuristic(self):
+        for row in range(self.rows):
+            for col in range(self.cols):
+                cell = self.maze[row][col]
+                heuristic_curr_cell = self.__get_manhattan_distance(cell)
+                self.maze[row][col].heuristic_val = heuristic_curr_cell
+                self.heuristic_dict[cell] = heuristic_curr_cell
 
-    def __greedy(self, start, goals):
+    def __greedy(self):
+        self.__calc_heuristic()
+        fringe, visited, path = [], set(), []
+        paths_dict = {self.start: None}
+        fringe.append((self.heuristic_dict[self.start], self.start))
+        while fringe:
+            # print('start')
+            # for h, cell in fringe:
+            #     print(h, cell.row, cell.col)
+            # print('end')
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
+
+            heuristic_val, cell = min(fringe, key=lambda x: x[0])
+            fringe.remove((heuristic_val, cell))
+
+            if cell in self.goals:
+                self.__visualize_path(cell, paths_dict)
+                return
+
+            if cell not in visited:
+                visited.add(cell)
+                cell.make_visited()
+                temp_lst = self.__expand(cell)
+                neighbors = []
+                for neighbor in temp_lst:
+                    if neighbor not in visited:
+                        neighbors.append((neighbor.heuristic_val, neighbor))
+                        neighbor.make_explored()
+                        paths_dict[neighbor] = cell
+                neighbors.sort(key=lambda x: x[0])
+                fringe.extend(neighbors)
+
+            self.__draw_scene()
+
+    def __astar(self):
         pass
 
     def __visualize_path(self, goal, paths_dict):
@@ -151,7 +195,7 @@ class MazeManager:
             self.__draw_scene()
 
     def play(self, algorithm):
-        start, goals, playing = None, [], False
+        playing, self.start, self.goals = False, None, []
         while True:
             self.screen.fill("Black")
             self.__draw_scene()
@@ -163,17 +207,17 @@ class MazeManager:
                 if not playing:
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE:
-                            if start and len(goals) >= 0:
+                            if self.start and len(self.goals) >= 0:
                                 playing = True
                                 match algorithm:
                                     case 'bfs':
-                                        self.__bfs(start, goals)
+                                        self.__bfs()
                                     case 'dfs':
-                                        self.__dfs(start, goals)
+                                        self.__dfs()
                                     case 'greedy':
-                                        self.__greedy(start, goals)
+                                        self.__greedy()
                                     case 'astar':
-                                        self.__astar(start, goals)
+                                        self.__astar()
                                 playing = False
 
                     if pygame.mouse.get_pressed()[0]:
@@ -181,25 +225,25 @@ class MazeManager:
                         row, col = self.__get_clicked_pos(pos)
                         if row is not None and col is not None:
                             cell = self.maze[row][col]
-                            if not start and cell not in goals:
-                                start = cell
+                            if not self.start and cell not in self.goals:
+                                self.start = cell
                                 cell.make_start()
-                            elif cell != start and cell not in goals:
+                            elif cell != self.start and cell not in self.goals:
                                 cell.make_obstacle()
                     elif pygame.mouse.get_pressed()[1]:
                         pos = pygame.mouse.get_pos()
                         row, col = self.__get_clicked_pos(pos)
                         cell = self.maze[row][col]
-                        if cell not in goals:
+                        if cell not in self.goals:
                             cell.make_goal()
-                            goals.append(cell)
+                            self.goals.append(cell)
                     elif pygame.mouse.get_pressed()[2]:
                         pos = pygame.mouse.get_pos()
                         row, col = self.__get_clicked_pos(pos)
                         cell = self.maze[row][col]
                         cell.reset()
-                        if cell == start:
-                            start = None
-                        if cell in goals:
-                            goals.remove(cell)
+                        if cell == self.start:
+                            self.start = None
+                        if cell in self.goals:
+                            self.goals.remove(cell)
             pygame.display.update()

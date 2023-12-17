@@ -118,7 +118,8 @@ class GUI:
                     exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.back_from_instructions_button.check_for_input(pygame.mouse.get_pos()):
-                        self.main_menu()
+                        # self.main_menu()
+                        return
 
             pygame.display.update()
 

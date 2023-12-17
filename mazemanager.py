@@ -150,10 +150,6 @@ class MazeManager:
         paths_dict = {self.start: None}
         fringe.append((self.heuristic_dict[self.start], self.start))
         while fringe:
-            # print('start')
-            # for h, cell in fringe:
-            #     print(h, cell.row, cell.col)
-            # print('end')
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -219,6 +215,7 @@ class MazeManager:
                                     case 'astar':
                                         self.__astar()
                                 playing = False
+                                return
 
                     if pygame.mouse.get_pressed()[0]:
                         pos = pygame.mouse.get_pos()

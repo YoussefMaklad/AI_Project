@@ -14,6 +14,7 @@ class Cell:
         self.y = col * self.height
         self.color = WHITE
         self.neighbours = []
+        self.heuristic_val = -1
 
     def get_pos(self):
         return self.row, self.col
@@ -56,3 +57,6 @@ class Cell:
 
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
+
+    def __lt__(self, other):
+        return False

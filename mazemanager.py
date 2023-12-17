@@ -1,6 +1,7 @@
 import pygame
 import random
 from collections import deque as queue
+from queue import PriorityQueue
 from cell import Cell
 from colors import *
 
@@ -178,7 +179,37 @@ class MazeManager:
             self.__draw_scene()
 
     def __astar(self):
-        pass
+        fringe, visited = PriorityQueue(), set()
+        paths_dict = {self.start: None}
+        fringe.put((0, self.start))
+
+        while not fringe.empty():
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
+
+            _, cell = fringe.get()
+
+            if cell in self.goals:
+                self.__visualize_path(cell, paths_dict)
+                return
+
+            if cell not in visited:
+                visited.add(cell)
+                cell.make_visited()
+                neighbors = self.__expand(cell)
+                for neighbor in neighbors:
+                    if neighbor not in visited:
+                        g_score = self.__get_manhattan_distance(cell)
+                        h_score = self.__get_manhattan_distance(neighbor)
+                        f_score = g_score + h_score
+
+                        fringe.put((f_score, neighbor))
+                        neighbor.make_explored()
+                        paths_dict[neighbor] = cell
+
+                self.__draw_scene()
 
     def __visualize_path(self, goal, paths_dict):
         path, current_cell = [], goal

@@ -26,7 +26,6 @@ class Graph:
             neighbors = self.graph_dict.get(str(node), [])
             new_path = [path + [element] for element in neighbors]
             return new_path
-
         return wrapper
 
     @staticmethod

@@ -5,7 +5,6 @@ from queue import PriorityQueue
 from cell import Cell
 from colors import *
 
-
 class MazeManager:
     def __init__(self, screen, rows, cols, width, height):
         self.screen = screen
@@ -18,19 +17,14 @@ class MazeManager:
 
     def __expand(self, cell: Cell):
         cell.neighbours = []
-
         if cell.row < cell.total_rows - 1 and not self.maze[cell.row + 1][cell.col].is_obstacle(): # down
             cell.neighbours.append(self.maze[cell.row + 1][cell.col])
-
         if cell.row > 0 and not self.maze[cell.row - 1][cell.col].is_obstacle(): # up
             cell.neighbours.append(self.maze[cell.row - 1][cell.col])
-
         if cell.col > 0 and not self.maze[cell.row][cell.col - 1].is_obstacle(): # left
             cell.neighbours.append(self.maze[cell.row][cell.col - 1])
-
         if cell.col < cell.total_cols - 1 and not self.maze[cell.row][cell.col + 1].is_obstacle(): # right
             cell.neighbours.append(self.maze[cell.row][cell.col + 1])
-
         return cell.neighbours
 
     def create_maze(self):
@@ -75,12 +69,10 @@ class MazeManager:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
-
             cell = fringe.popleft()
             if cell in self.goals:
                 self.__visualize_path(cell, paths_dict)
                 return
-
             if cell not in visited:
                 visited.add(cell)
                 cell.make_visited()
@@ -90,7 +82,6 @@ class MazeManager:
                         fringe.append(neighbor)
                         neighbor.make_explored()
                         paths_dict[neighbor] = cell
-
             self.__draw_scene()
 
     def __dfs(self):
@@ -101,7 +92,6 @@ class MazeManager:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
-
             if fringe[0] == [self.start]:
                 cell = fringe.pop()[0]
             else:
@@ -110,11 +100,9 @@ class MazeManager:
                 lst.remove(cell)
                 if len(lst) != 0:
                     fringe.append(lst)
-
             if cell in self.goals:
                 self.__visualize_path(cell, paths_dict)
                 return
-
             if cell not in visited:
                 visited.add(cell)
                 cell.make_visited()
@@ -127,7 +115,6 @@ class MazeManager:
                         paths_dict[neighbor] = cell
                 if len(final_neighbours) > 0:
                     fringe.append(final_neighbours)
-
             self.__draw_scene()
 
     def __get_manhattan_distance(self, cell):
@@ -151,18 +138,14 @@ class MazeManager:
         paths_dict = {self.start: None}
         fringe.append((self.heuristic_dict[self.start], self.start))
         while fringe:
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
-
             heuristic_val, cell = min(fringe, key=lambda x: x[0])
             fringe.remove((heuristic_val, cell))
-
             if cell in self.goals:
                 self.__visualize_path(cell, paths_dict)
                 return
-
             if cell not in visited:
                 visited.add(cell)
                 cell.make_visited()
@@ -175,41 +158,10 @@ class MazeManager:
                         paths_dict[neighbor] = cell
                 neighbors.sort(key=lambda x: x[0])
                 fringe.extend(neighbors)
-
             self.__draw_scene()
 
     def __astar(self):
-        fringe, visited = PriorityQueue(), set()
-        paths_dict = {self.start: None}
-        fringe.put((0, self.start))
-
-        while not fringe.empty():
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    exit()
-
-            _, cell = fringe.get()
-
-            if cell in self.goals:
-                self.__visualize_path(cell, paths_dict)
-                return
-
-            if cell not in visited:
-                visited.add(cell)
-                cell.make_visited()
-                neighbors = self.__expand(cell)
-                for neighbor in neighbors:
-                    if neighbor not in visited:
-                        g_score = self.__get_manhattan_distance(cell)
-                        h_score = self.__get_manhattan_distance(neighbor)
-                        f_score = g_score + h_score
-
-                        fringe.put((f_score, neighbor))
-                        neighbor.make_explored()
-                        paths_dict[neighbor] = cell
-
-                self.__draw_scene()
+        pass
 
     def __visualize_path(self, goal, paths_dict):
         path, current_cell = [], goal
@@ -226,11 +178,9 @@ class MazeManager:
         while True:
             self.screen.fill("Black")
             self.__draw_scene()
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
-
                 if not playing:
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE:
@@ -247,7 +197,6 @@ class MazeManager:
                                         self.__astar()
                                 playing = False
                                 return
-
                     if pygame.mouse.get_pressed()[0]:
                         pos = pygame.mouse.get_pos()
                         row, col = self.__get_clicked_pos(pos)

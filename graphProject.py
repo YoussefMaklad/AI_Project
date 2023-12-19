@@ -25,6 +25,7 @@ class Graph:
             func(self, node, path)
             neighbors = self.graph_dict.get(str(node), [])
             new_path = [path + [element] for element in neighbors]
+            print(new_path)
             return new_path
         return wrapper
 
@@ -64,7 +65,6 @@ class Graph:
 
     def dfs(self, fringe, visited):
         if fringe:
-            print(fringe)
             path = fringe.pop()
             node = path[-1]
             if self.check_goal(node):

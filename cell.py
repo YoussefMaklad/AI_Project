@@ -13,7 +13,7 @@ class Cell:
         self.x = row * self.width
         self.y = col * self.height
         self.color = WHITE
-        self.neighbours = []
+        self.neighbors = []
         self.heuristic_val = -1
 
     def get_pos(self):

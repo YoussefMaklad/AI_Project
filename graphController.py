@@ -31,6 +31,7 @@ def calling_function(edge, cost, heuristic, strategy, start, goal):
         case "dfs":
             visited, fringe = set(), list([[start]])
             while fringe:
+                # print(fringe)
                 ans = g.dfs(fringe, visited)
                 if ans:
                     break

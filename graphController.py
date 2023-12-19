@@ -1,4 +1,5 @@
 from graphProject import Graph
+from collections import deque as queue
 
 edges = [("A", "B"), ("A", "C"), ("B", "D"), ("C", "D"), ("D", "E"), ("E", "G"), ("D", "G")]
 costs = {
@@ -27,11 +28,17 @@ def calling_function(edge, cost, heuristic, strategy, start, goal):
                 return ans
             return None
         case "bfs":
-            action - 2
+            visited, fringe = set(), queue([[start]])
+            while fringe:
+                ans = g.bfs(fringe, visited)
+                if ans:
+                    break
+            if ans:
+                return ans
+            return ans
         case "dfs":
             visited, fringe = set(), list([[start]])
             while fringe:
-                # print(fringe)
                 ans = g.dfs(fringe, visited)
                 if ans:
                     break
@@ -60,4 +67,4 @@ def calling_function(edge, cost, heuristic, strategy, start, goal):
             return None
 
 
-print(calling_function(edges, costs, heuristic, "dfs", "A", "G"))
+print(calling_function(edges, costs, heuristic, "bfs", "A", "G"))

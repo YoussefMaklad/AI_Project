@@ -1,6 +1,3 @@
-from collections import deque as queue
-
-
 class Graph:
     def __init__(self, edges, costs, heuristic, goals):
         self.graph_dict = {}
@@ -25,7 +22,6 @@ class Graph:
             func(self, node, path)
             neighbors = self.graph_dict.get(str(node), [])
             new_path = [path + [element] for element in neighbors]
-            print(new_path)
             return new_path
         return wrapper
 
@@ -46,9 +42,8 @@ class Graph:
     def expand_bfs(self, node, path):
         pass
 
-    def bfs(self, start):
-        visited, fringe = set(), queue([[start]])
-        while fringe:
+    def bfs(self, fringe, visited):
+        if fringe:
             path = fringe.popleft()
             node = path[-1]
             if self.check_goal(node):
@@ -57,7 +52,7 @@ class Graph:
                 if tuple(node) not in visited:
                     visited.add(tuple(node))
                     fringe.extend(self.expand_bfs(node, path))
-        return None
+        return False
 
     @expand_decorator
     def expand_dfs(self, node, path):

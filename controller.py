@@ -24,7 +24,6 @@ costs = {
 heuristic = {"A": 5, "B": 15, "C": 1, "D": 20, "E": 0, "G": 1000}
 g = Graph(edges, costs, heuristic, "G")
 
-
 def calling_function(edge, cost, heuristic, strategy, start, goal):
     g = Graph(edge, cost, heuristic, goal)
     match strategy:

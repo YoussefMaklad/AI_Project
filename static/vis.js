@@ -6,27 +6,19 @@ var selectedEdgeId = null;
 var container = document.getElementById("mynetwork");
 var nodeSelect = document.getElementById("nodeSelect");
 var nodeSelect1 = document.getElementById("nodeSelect1");
-
 var data = {
   nodes: nodes,
   edges: edges,
 };
-
 var options = {};
 var network = new vis.Network(container, data, options);
-
 var nodeIdCounter = 1;
-
 function addNode() {
-  // Use the counter as the new node ID
   var newNodeId = nodeIdCounter++;
-
   var newNodeLabel = "Node " + newNodeId;
-
   var nodeFont = {
     color: "white",
   };
-
   var newNode = {
     id: newNodeId,
     label: newNodeLabel + "\nh=1",
@@ -34,21 +26,15 @@ function addNode() {
     font: nodeFont,
     heuristic: 1,
   };
-
-  // Check if the node with the same ID already exists
   if (nodes.get(newNodeId) === null) {
     nodes.add(newNode);
     heuristic[newNodeLabel] = newNode.heuristic;
-
-    // Update the select dropdown with the names of every node
     updateNodeSelect();
     updateNodeSelect2();
-    // Call the function to add checkboxes and options
   } else {
     console.error("Node with ID " + newNodeId + " already exists.");
   }
 }
-
 function updateNodeSelect() {
   var nodeOptions = nodes
     .get()
@@ -60,16 +46,12 @@ function updateNodeSelect() {
   nodeSelect.innerHTML = `<option value="0">Start:</option>${nodeOptions}`;
 }
 var goals = [];
-
 function updateNodeSelect2() {
   var container = document.getElementById("customDropdown").querySelector("ul");
   container.innerHTML = "";
-
   var selectedNodeId = network.getSelectedNodes()[0];
   var selectedNode = nodes.get(selectedNodeId);
-
   if (selectedNode && selectedNode.label) {
-    // Remove the deleted node's <li> element
     var deletedLi = container.querySelector(
       `li:has([id='${selectedNode.label.split("\n")[0]}'])`
     );
@@ -77,22 +59,18 @@ function updateNodeSelect2() {
       container.removeChild(deletedLi);
     }
   }
-
   var nodeOptions = nodes
     .get()
     .map(
       (node) =>
         `<li>
-          <input type="checkbox" id="${
-            node.label.split("\n")[0]
-          }" class="custom-checkbox" />
+          <input type="checkbox" id="${node.label.split("\n")[0]
+        }" class="custom-checkbox" />
           <label for="${node.label.split("\n")[0]}">${node.label}</label>
         </li>`
     )
     .join("");
-
   container.innerHTML = nodeOptions;
-
   var checkboxes = container.querySelectorAll(".custom-checkbox");
   checkboxes.forEach(function (checkbox) {
     checkbox.addEventListener("change", function () {
@@ -103,12 +81,10 @@ function updateNodeSelect2() {
         this.parentElement.classList.remove("checked");
         goals = goals.filter((goal) => goal !== this.id);
       }
-
       console.log(goals);
     });
   });
 }
-
 network.on("doubleClick", function (params) {
   if (params.nodes.length > 0) {
     if (!selectedNodeId) {
@@ -131,7 +107,6 @@ network.on("doubleClick", function (params) {
     }
   }
 });
-
 function editNode() {
   var selectedNodeId = network.getSelectedNodes()[0];
   if (selectedNodeId) {
@@ -145,16 +120,13 @@ function editNode() {
     customAlert("Please select a node to edit.");
   }
 }
-
 function closeModal() {
   document.getElementById("myModal").style.display = "none";
 }
-
 function updateNodeLabelAndHeuristic() {
   var selectedNodeId = network.getSelectedNodes()[0];
   var newLabel = document.getElementById("newLabel").value;
   var newHeuristic = parseInt(document.getElementById("newHeuristic").value);
-
   if (selectedNodeId && newLabel.trim() !== "") {
     delete heuristic[nodes.get(selectedNodeId).label.split("\n")[0]];
     heuristic[newLabel] = newHeuristic;
@@ -169,7 +141,6 @@ function updateNodeLabelAndHeuristic() {
     alert("Invalid input. Please enter a valid label and heuristic value.");
   }
 }
-
 function editEdge() {
   var selectedEdgeId = network.getSelectedEdges()[0];
   if (selectedEdgeId) {
@@ -179,11 +150,9 @@ function editEdge() {
     customAlert("Please select an edge to edit.");
   }
 }
-
 function clearEditEdgeInput() {
   document.getElementById("newEdgeLabel").value = "";
 }
-
 function closeEdgeModal() {
   document.getElementById("edgeModal").style.display = "none";
 }
@@ -234,37 +203,37 @@ function solve() {
   })
     .then((response) => response.json())
     .then((data) => {
-      
+
       console.log("Result:", data.result);
-      console.log("nodes",data.visited)
-      var result=data.result;
-      var visited= data.visited;
+      console.log("nodes", data.visited)
+      var result = data.result;
+      var visited = data.visited;
       colorNodesWithDelay(visited, 'grey', 3000);
-      
+
       function findNodeByLabel(label) {
         return nodes.get().find(function (node) {
           return node.label.split("\n")[0] === label;
         });
       }
-      
-      
-      
+
+
+
       function colorNodeByLabel(label, color) {
         var foundNode = findNodeByLabel(label);
         if (foundNode) {
-          nodes.update({ id: foundNode.id, color: { background: color} });
+          nodes.update({ id: foundNode.id, color: { background: color } });
         }
       }
-      
-      
+
+
       function colorNodesWithDelay(labels, color, delay) {
         labels.forEach(function (label, index) {
           setTimeout(function () {
             colorNodeByLabel(label, color);
-      
-            
+
+
             if (index === labels.length - 1) {
-              
+
               setTimeout(function () {
                 colorNodesWithDelay2(result, 'purple', 2000);
               }, 3000);
@@ -287,7 +256,7 @@ function solve() {
           }
         });
       }
-      
+
     })
     .catch((error) => console.error("Error:", error));
 }

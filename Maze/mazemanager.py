@@ -23,16 +23,22 @@ class MazeManager:
     def __expand(self, cell: Cell):
         cell.neighbours = []
 
-        if cell.row < cell.total_rows - 1 and not self.maze[cell.row + 1][cell.col].is_obstacle(): # down
+        if (
+            cell.row < cell.total_rows - 1
+            and not self.maze[cell.row + 1][cell.col].is_obstacle()
+        ):  # down
             cell.neighbours.append(self.maze[cell.row + 1][cell.col])
 
-        if cell.row > 0 and not self.maze[cell.row - 1][cell.col].is_obstacle(): # up
+        if cell.row > 0 and not self.maze[cell.row - 1][cell.col].is_obstacle():  # up
             cell.neighbours.append(self.maze[cell.row - 1][cell.col])
 
-        if cell.col > 0 and not self.maze[cell.row][cell.col - 1].is_obstacle(): # left
+        if cell.col > 0 and not self.maze[cell.row][cell.col - 1].is_obstacle():  # left
             cell.neighbours.append(self.maze[cell.row][cell.col - 1])
 
-        if cell.col < cell.total_cols - 1 and not self.maze[cell.row][cell.col + 1].is_obstacle(): # right
+        if (
+            cell.col < cell.total_cols - 1
+            and not self.maze[cell.row][cell.col + 1].is_obstacle()
+        ):  # right
             cell.neighbours.append(self.maze[cell.row][cell.col + 1])
 
         return cell.neighbours
@@ -51,9 +57,13 @@ class MazeManager:
         gap_row = self.height // self.rows
         gap_col = self.width // self.cols
         for i in range(self.rows):
-            pygame.draw.line(self.screen, GREY, (0, i * gap_row), (self.width, i * gap_row))
+            pygame.draw.line(
+                self.screen, GREY, (0, i * gap_row), (self.width, i * gap_row)
+            )
             for j in range(self.cols):
-                pygame.draw.line(self.screen, GREY, (j * gap_col, 0), (j * gap_col, self.height))
+                pygame.draw.line(
+                    self.screen, GREY, (j * gap_col, 0), (j * gap_col, self.height)
+                )
 
     def __draw_scene(self):
         self.screen.fill(WHITE)
@@ -139,7 +149,7 @@ class MazeManager:
         return abs(x1 - x2) + abs(y1 - y2)
 
     def __get_manhattan_distance(self, cell):
-        min_distance = float('inf')
+        min_distance = float("inf")
         for goal in self.goals:
             distance = abs(cell.row - goal.row) + abs(cell.col - goal.col)
             min_distance = min(min_distance, distance)
@@ -207,7 +217,9 @@ class MazeManager:
                 neighbors = []
                 for neighbor in temp_lst:
                     if neighbor not in visited:
-                        f_score = neighbor.heuristic_val + self.__get_cost(self.start, neighbor)
+                        f_score = neighbor.heuristic_val + self.__get_cost(
+                            self.start, neighbor
+                        )
                         neighbors.append((f_score, neighbor))
                         neighbor.make_explored()
                         paths_dict[neighbor] = cell
@@ -272,15 +284,15 @@ class MazeManager:
                             if self.start and len(self.goals) >= 0:
                                 playing = True
                                 match algorithm:
-                                    case 'bfs':
+                                    case "bfs":
                                         self.__bfs()
-                                    case 'dfs':
+                                    case "dfs":
                                         self.__dfs()
-                                    case 'greedy':
+                                    case "greedy":
                                         self.__greedy()
-                                    case 'astar':
+                                    case "astar":
                                         self.__astar()
-                                    case 'ucs':
+                                    case "ucs":
                                         self.__ucs()
                                 playing = False
                                 return

@@ -43,16 +43,18 @@ class Perceptron:
 
 
 np.random.seed(42)
-url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/tic-tac-toe/tic-tac-toe.data'
+url = "https://archive.ics.uci.edu/ml/machine-learning-databases/tic-tac-toe/tic-tac-toe.data"
 df = pd.read_csv(url, header=None)
-mapping = {'x': 1, 'o': -1, 'b': 0}
+mapping = {"x": 1, "o": -1, "b": 0}
 for col in df.columns[:-1]:
     df[col] = df[col].map(mapping)
 X = df.iloc[:, :-1].values.tolist()
 y = df.iloc[:, -1]
 label_encoder = LabelEncoder()
 y = label_encoder.fit_transform(y)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 input_size = len(X_train[0])
 perceptron = Perceptron(input_size)
 perceptron.train(X_train, y_train)

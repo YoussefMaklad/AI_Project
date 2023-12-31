@@ -18,7 +18,14 @@ costs = {
     ("Node 2", "Node 1"): "1",
 }
 
-heuristic = {"Node 1": 1, "Node 2": 1, "Node 3": 1, "Node 4": 1, "Node 5": 1, "Node 6": 1}
+heuristic = {
+    "Node 1": 1,
+    "Node 2": 1,
+    "Node 3": 1,
+    "Node 4": 1,
+    "Node 5": 1,
+    "Node 6": 1,
+}
 
 
 def calling_function(edge, cost, heuristic, strategy, start, goal):

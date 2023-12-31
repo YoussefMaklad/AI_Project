@@ -51,7 +51,8 @@ html, body {
   width: 78%;
   margin-top: 4%;
   margin-left: 10%;
-  padding: 0 20px; /* Fix the typo: should be 0 20px instead of 0,20px */
+  padding: 0 20px;
+  /* Fix the typo: should be 0 20px instead of 0,20px */
   background-color: rgba(255, 255, 255, 0.1);
   z-index: 10;
   position: relative;
@@ -69,40 +70,41 @@ html, body {
   font-size: 27px;
   color: #fff;
   text-shadow:
-      0 0 7px blue,
-      0 0 10px blue,
-      0 0 21px blue,
-      0 0 42px blue,
-      0 0 82px blue,
-      0 0 92px blue,
-      0 0 102px blue,
-      0 0 151px blue;
-  animation: pulsate 2s infinite; /* Apply the keyframes animation */
+    0 0 7px blue,
+    0 0 10px blue,
+    0 0 21px blue,
+    0 0 42px blue,
+    0 0 82px blue,
+    0 0 92px blue,
+    0 0 102px blue,
+    0 0 151px blue;
+  animation: pulsate 2s infinite;
+  /* Apply the keyframes animation */
 }
 
 @keyframes pulsate {
   100% {
-      text-shadow:
-          0 0 4px #fff,
-          0 0 11px blue,
-          0 0 19px blue,
-          0 0 40px blue,
-          0 0 80px blue,
-          0 0 90px blue,
-          0 0 100px blue,
-          0 0 150px blue;
+    text-shadow:
+      0 0 4px #fff,
+      0 0 11px blue,
+      0 0 19px blue,
+      0 0 40px blue,
+      0 0 80px blue,
+      0 0 90px blue,
+      0 0 100px blue,
+      0 0 150px blue;
   }
 
   0% {
-      text-shadow:
-          0 0 2px #fff,
-          0 0 4px #fff,
-          0 0 6px #fff,
-          0 0 10px blue,
-          0 0 45px blue,
-          0 0 55px blue,
-          0 0 70px blue,
-          0 0 80px blue;
+    text-shadow:
+      0 0 2px #fff,
+      0 0 4px #fff,
+      0 0 6px #fff,
+      0 0 10px blue,
+      0 0 45px blue,
+      0 0 55px blue,
+      0 0 70px blue,
+      0 0 80px blue;
   }
 }
 
@@ -138,7 +140,7 @@ nav ul li a {
   display: inline;
 }
 
-button, #strategy,#nodeSelect,#nodeSelect1 {
+button, #strategy, #nodeSelect, #nodeSelect1 {
   margin-right: 2px;
   padding: 10px 20px;
   align-items: center;
@@ -163,7 +165,7 @@ button, #strategy,#nodeSelect,#nodeSelect1 {
   cursor: pointer;
 }
 
-button:after, #strategy:after,  #nodeSelect:after {
+button:after, #strategy:after, #nodeSelect:after {
   background-color: #111;
   border-radius: 8px;
   content: "";
@@ -177,6 +179,7 @@ button:after, #strategy:after,  #nodeSelect:after {
   transition: transform 0.2s ease-out;
   z-index: -1;
 }
+
 #strategy:after {
   background-color: #111;
   border-radius: 8px;
@@ -188,16 +191,17 @@ button:after, #strategy:after,  #nodeSelect:after {
   position: absolute;
   top: -2px;
   transform: translate(8px, 8px);
-  transition: transform 0.2s ease-out; /* Ensure that the transition is defined */
+  transition: transform 0.2s ease-out;
+  /* Ensure that the transition is defined */
   z-index: -1;
 }
 
 
-button:hover:after, #strategy:hover:after, #nodeSelect:hover:after  {
+button:hover:after, #strategy:hover:after, #nodeSelect:hover:after {
   transform: translate(0, 0);
 }
 
-button:active, #strategy:active,  #nodeSelect:active {
+button:active, #strategy:active, #nodeSelect:active {
   background-color: palevioletred;
   outline: 0;
 }
@@ -207,7 +211,7 @@ button:hover, #strategy:hover, #nodeSelect:hover {
 }
 
 .light {
-   margin-left: 0px; 
+  margin-left: 0px;
 }
 
 .custom-alert {
@@ -273,22 +277,24 @@ label {
   width: 50%;
   margin-top: 20px;
 }
-.light2
-{
+
+.light2 {
   margin-bottom: 0px;
 }
-.input{
+
+.input {
   background-color: var(--lightblue);
-  color:white;
+  color: white;
 }
- #customDropdown {
+
+#customDropdown {
   display: inline-block;
   position: relative;
   background-color: var(--lightblue);
-  
+
 }
 
- #customDropdown input {
+#customDropdown input {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -308,9 +314,9 @@ label {
   border: 1px solid #0969b8;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
-  background-color: rgba(255, 255, 255, 0); 
+  background-color: rgba(255, 255, 255, 0);
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-  color:palevioletred ;
+  color: palevioletred;
   bottom: 100%;
 }
 
@@ -326,7 +332,7 @@ label {
   background-color: #f5f5f5;
 }
 
-#customDropdown input:focus + ul {
+#customDropdown input:focus+ul {
   display: block;
 }
 
@@ -336,23 +342,24 @@ label {
 
 #customDropdown ul li input[type="checkbox"] {
   margin-right: 8px;
-  width: 15px; 
-  height: 15px; 
+  width: 15px;
+  height: 15px;
   border: 1px solid #ccc;
   border-radius: 3px;
   cursor: pointer;
 }
+
 #customDropdown ul::-webkit-scrollbar {
-  width: 10px; 
+  width: 10px;
 }
 
 
 #customDropdown ul::-webkit-scrollbar-thumb {
-  background-color: #808080; 
-  border-radius: 10px; 
+  background-color: #808080;
+  border-radius: 10px;
 }
 
 
 #customDropdown ul::-webkit-scrollbar-track {
-  background-color: #f1f1f1; 
+  background-color: #f1f1f1;
 }

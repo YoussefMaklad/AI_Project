@@ -1,7 +1,5 @@
 import pygame
 import random
-import tkinter as tk
-import threading
 from tkinter import messagebox
 from collections import deque as queue
 from cell import Cell
@@ -16,6 +14,7 @@ class MazeManager:
         self.cols = cols
         self.width = width
         self.height = height
+        self.pressed_button = None
 
     def __show_messagebox(self):
         messagebox.showinfo("Note", "No Path Found")
@@ -23,22 +22,16 @@ class MazeManager:
     def __expand(self, cell: Cell):
         cell.neighbours = []
 
-        if (
-            cell.row < cell.total_rows - 1
-            and not self.maze[cell.row + 1][cell.col].is_obstacle()
-        ):  # down
+        if cell.row < cell.total_rows - 1 and not self.maze[cell.row + 1][cell.col].is_obstacle(): # down
             cell.neighbours.append(self.maze[cell.row + 1][cell.col])
 
-        if cell.row > 0 and not self.maze[cell.row - 1][cell.col].is_obstacle():  # up
+        if cell.row > 0 and not self.maze[cell.row - 1][cell.col].is_obstacle(): # up
             cell.neighbours.append(self.maze[cell.row - 1][cell.col])
 
-        if cell.col > 0 and not self.maze[cell.row][cell.col - 1].is_obstacle():  # left
+        if cell.col > 0 and not self.maze[cell.row][cell.col - 1].is_obstacle(): # left
             cell.neighbours.append(self.maze[cell.row][cell.col - 1])
 
-        if (
-            cell.col < cell.total_cols - 1
-            and not self.maze[cell.row][cell.col + 1].is_obstacle()
-        ):  # right
+        if cell.col < cell.total_cols - 1 and not self.maze[cell.row][cell.col + 1].is_obstacle(): # right
             cell.neighbours.append(self.maze[cell.row][cell.col + 1])
 
         return cell.neighbours
@@ -57,13 +50,9 @@ class MazeManager:
         gap_row = self.height // self.rows
         gap_col = self.width // self.cols
         for i in range(self.rows):
-            pygame.draw.line(
-                self.screen, GREY, (0, i * gap_row), (self.width, i * gap_row)
-            )
+            pygame.draw.line(self.screen, GREY, (0, i * gap_row), (self.width, i * gap_row))
             for j in range(self.cols):
-                pygame.draw.line(
-                    self.screen, GREY, (j * gap_col, 0), (j * gap_col, self.height)
-                )
+                pygame.draw.line(self.screen, GREY, (j * gap_col, 0), (j * gap_col, self.height))
 
     def __draw_scene(self):
         self.screen.fill(WHITE)
@@ -104,6 +93,8 @@ class MazeManager:
                         fringe.append(neighbor)
                         neighbor.make_explored()
                         paths_dict[neighbor] = cell
+            if self.rows <= 15 or self.cols <= 15:
+                pygame.time.delay(50)
             self.__draw_scene()
 
     def __dfs(self):
@@ -149,7 +140,7 @@ class MazeManager:
         return abs(x1 - x2) + abs(y1 - y2)
 
     def __get_manhattan_distance(self, cell):
-        min_distance = float("inf")
+        min_distance = float('inf')
         for goal in self.goals:
             distance = abs(cell.row - goal.row) + abs(cell.col - goal.col)
             min_distance = min(min_distance, distance)
@@ -217,9 +208,7 @@ class MazeManager:
                 neighbors = []
                 for neighbor in temp_lst:
                     if neighbor not in visited:
-                        f_score = neighbor.heuristic_val + self.__get_cost(
-                            self.start, neighbor
-                        )
+                        f_score = neighbor.heuristic_val + self.__get_cost(self.start, neighbor)
                         neighbors.append((f_score, neighbor))
                         neighbor.make_explored()
                         paths_dict[neighbor] = cell
@@ -264,6 +253,8 @@ class MazeManager:
         path = path[::-1]
         for cell in path:
             cell.make_path()
+            if self.rows <= 15 or self.cols <= 15:
+                pygame.time.delay(50)
             self.__draw_scene()
 
     def play(self, algorithm):
@@ -284,37 +275,42 @@ class MazeManager:
                             if self.start and len(self.goals) >= 0:
                                 playing = True
                                 match algorithm:
-                                    case "bfs":
+                                    case 'bfs':
                                         self.__bfs()
-                                    case "dfs":
+                                    case 'dfs':
                                         self.__dfs()
-                                    case "greedy":
+                                    case 'greedy':
                                         self.__greedy()
-                                    case "astar":
+                                    case 'astar':
                                         self.__astar()
-                                    case "ucs":
+                                    case 'ucs':
                                         self.__ucs()
                                 playing = False
                                 return
+
+                        if event.key == pygame.K_s:
+                            self.pressed_button = 's'
+                        elif event.key == pygame.K_g:
+                            self.pressed_button = 'g'
+                        elif event.key == pygame.K_o:
+                            self.pressed_button = 'o'
 
                     if pygame.mouse.get_pressed()[0]:
                         pos = pygame.mouse.get_pos()
                         row, col = self.__get_clicked_pos(pos)
                         if row is not None and col is not None:
                             cell = self.maze[row][col]
-                            if not self.start and cell not in self.goals:
-                                self.start = cell
-                                cell.make_start()
-                            elif cell != self.start and cell not in self.goals:
-                                cell.make_obstacle()
-                    elif pygame.mouse.get_pressed()[1]:
-                        pos = pygame.mouse.get_pos()
-                        row, col = self.__get_clicked_pos(pos)
-                        cell = self.maze[row][col]
-                        if cell not in self.goals:
-                            cell.make_goal()
-                            self.goals.append(cell)
-                    elif pygame.mouse.get_pressed()[2]:
+                            match self.pressed_button:
+                                case 's' if not self.start and cell not in self.goals:
+                                    self.start = cell
+                                    cell.make_start()
+                                case 'o' if cell != self.start and cell not in self.goals:
+                                    cell.make_obstacle()
+                                case 'g' if cell not in self.goals:
+                                    cell.make_goal()
+                                    self.goals.append(cell)
+
+                    if pygame.mouse.get_pressed()[2]:
                         pos = pygame.mouse.get_pos()
                         row, col = self.__get_clicked_pos(pos)
                         cell = self.maze[row][col]
@@ -323,4 +319,5 @@ class MazeManager:
                             self.start = None
                         if cell in self.goals:
                             self.goals.remove(cell)
+
             pygame.display.update()

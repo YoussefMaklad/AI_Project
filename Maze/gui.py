@@ -76,17 +76,17 @@ class GUI:
                 "   - Press the SPACE key to begin the visualization.",
                 "",
                 "2. Drawing on the Grid:",
-                "   (All by using left click)",
+                "   (All by using Left Click)",
                 "   - S-Button: Set the start cell.",
                 "   - G-Button: Set goal cells.",
                 "   - O-Button: Set the obstacles.",
-                "   - RIGHT-CLICK: Erase.",
+                "   RIGHT-CLICK: Erase.",
                 "",
                 "3. Playing Controls:",
                 " - Press SPACE to initiate the selected algorithm after setting up the maze.",
                 " - Enjoy watching the algorithm find the path from start to goals.",
                 "",
-                "Have fun exploring the world of maze-solving algorithms in this interactive app!"
+                "Have fun exploring the world of maze-solving algorithms in the App!"
             ]
 
             self.instructions_title_text = self.__get_font(32).render(instructions_text[0], True, "#de892f")
@@ -123,7 +123,6 @@ class GUI:
                     exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.back_from_instructions_button.check_for_input(pygame.mouse.get_pos()):
-                        # self.main_menu()
                         return
 
             pygame.display.update()

@@ -10,11 +10,11 @@ class MazeManager:
     def __init__(self, screen, rows, cols, width, height):
         self.screen = screen
         self.maze = []
-        self.rows = rows
-        self.cols = cols
         self.width = width
         self.height = height
         self.pressed_button = None
+        self.rows = rows
+        self.cols = cols
 
     def __show_messagebox(self):
         messagebox.showinfo("Note", "No Path Found")
@@ -22,16 +22,16 @@ class MazeManager:
     def __expand(self, cell: Cell):
         cell.neighbours = []
 
-        if cell.row < cell.total_rows - 1 and not self.maze[cell.row + 1][cell.col].is_obstacle(): # down
+        if cell.row < cell.total_rows - 1 and not self.maze[cell.row + 1][cell.col].is_obstacle():  # down
             cell.neighbours.append(self.maze[cell.row + 1][cell.col])
 
-        if cell.row > 0 and not self.maze[cell.row - 1][cell.col].is_obstacle(): # up
+        if cell.row > 0 and not self.maze[cell.row - 1][cell.col].is_obstacle():  # up
             cell.neighbours.append(self.maze[cell.row - 1][cell.col])
 
-        if cell.col > 0 and not self.maze[cell.row][cell.col - 1].is_obstacle(): # left
+        if cell.col > 0 and not self.maze[cell.row][cell.col - 1].is_obstacle():  # left
             cell.neighbours.append(self.maze[cell.row][cell.col - 1])
 
-        if cell.col < cell.total_cols - 1 and not self.maze[cell.row][cell.col + 1].is_obstacle(): # right
+        if cell.col < cell.total_cols - 1 and not self.maze[cell.row][cell.col + 1].is_obstacle():  # right
             cell.neighbours.append(self.maze[cell.row][cell.col + 1])
 
         return cell.neighbours
@@ -66,9 +66,12 @@ class MazeManager:
         gap_row = self.height // self.rows
         gap_col = self.width // self.cols
         x, y = pos
-        row = x // gap_col
-        col = y // gap_row
-        return row, col
+        row = y // gap_row
+        col = x // gap_col
+        if 0 <= row < self.rows and 0 <= col < self.cols:
+            return row, col
+        else:
+            return None, None
 
     def __bfs(self):
         fringe, visited, path = queue(), set(), []
@@ -313,11 +316,12 @@ class MazeManager:
                     if pygame.mouse.get_pressed()[2]:
                         pos = pygame.mouse.get_pos()
                         row, col = self.__get_clicked_pos(pos)
-                        cell = self.maze[row][col]
-                        cell.reset()
-                        if cell == self.start:
-                            self.start = None
-                        if cell in self.goals:
-                            self.goals.remove(cell)
+                        if row is not None and col is not None:
+                            cell = self.maze[row][col]
+                            cell.reset()
+                            if cell == self.start:
+                                self.start = None
+                            if cell in self.goals:
+                                self.goals.remove(cell)
 
             pygame.display.update()

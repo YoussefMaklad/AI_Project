@@ -10,8 +10,8 @@ class Cell:
         self.width = height
         self.total_rows = total_rows
         self.total_cols = total_cols
-        self.x = row * self.width
-        self.y = col * self.height
+        self.y = row * self.height
+        self.x = col * self.width
         self.color = WHITE
         self.neighbours = []
         self.heuristic_val = -1

@@ -2,6 +2,7 @@ from flask import Flask, redirect, url_for, render_template, jsonify, request
 from flask_cors import CORS
 from graph import Graph
 from collections import deque as queue
+import subprocess
 
 app = Flask(__name__)
 CORS(app)
@@ -23,6 +24,12 @@ def home():
 @app.route("/vis.html")
 def graph():
     return render_template("vis.html")
+
+
+@app.route('/maze')
+def maze():
+    subprocess.run(['C:/Users/Youssef/PycharmProjects/AI_Project/Maze/main.exe'], stdout=subprocess.PIPE)
+    return redirect(url_for('home'))
 
 
 @app.route("/about.html")

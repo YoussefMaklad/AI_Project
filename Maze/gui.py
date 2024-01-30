@@ -11,6 +11,7 @@ class GUI:
         self.close_rows = self.close_cols = False
 
     def __get_font(self, size):
+        pygame.font.init()
         return pygame.font.Font("font.ttf", size)
 
     def __initialize_gui(self):
@@ -64,8 +65,9 @@ class GUI:
         self.screen.blit(self.cols_text, self.cols_rect)
 
     def __show_instructions(self):
-        while True:
-            self.screen.blit(pygame.image.load("instructions.jpeg"), (0, 0))
+        running = True
+        while running:
+            self.screen.blit(pygame.image.load("instructions.jpg"), (-150, 0))
 
             instructions_text = [
                 "Maze App Implementing AI Search Techniques!",
@@ -120,15 +122,20 @@ class GUI:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    exit()
+                    running = False
+                    break
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.back_from_instructions_button.check_for_input(pygame.mouse.get_pos()):
                         return
 
             pygame.display.update()
 
+            if not running:
+                break
+
     def main_menu(self):
         self.__initialize_gui()
+        running = True
         self.close_rows = self.close_cols = False
         buttons = [self.bfs_button, self.dfs_button, self.astar_button, self.greedy_button, self.ucs_button, self.instructions_button, self.quit_button]
         rows = cols = None
@@ -138,7 +145,7 @@ class GUI:
         color_cols = color_inactive_cols
         active_rows = active_cols = False
         text_rows = text_cols = ''
-        while True:
+        while running:
 
             mouse_pos = pygame.mouse.get_pos()
             self.__screen_blit()
@@ -149,7 +156,8 @@ class GUI:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    exit()
+                    running = False
+                    break
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.input_rows.collidepoint(event.pos):
@@ -212,7 +220,8 @@ class GUI:
                     if self.instructions_button.check_for_input(mouse_pos):
                         self.__show_instructions()
                     if self.quit_button.check_for_input(mouse_pos):
-                        exit()
+                        running = False
+                        break
 
             font = pygame.font.Font(None, 35)
 
@@ -226,19 +235,27 @@ class GUI:
 
             pygame.display.update()
 
+            if not running:
+                return None, None, None
+
     def show_new_back_button(self):
+        running = True
         self.back_from_algorithm_button = Button(image=pygame.image.load("Quit Rect.png"), pos=(self.width - 225, 200),
                                                  text_input="Back", font=self.__get_font(50), base_color="#d7fcd4",hovering_color="#03bafc")
-        while True:
+        while running:
 
             self.back_from_algorithm_button.change_color(pygame.mouse.get_pos())
             self.back_from_algorithm_button.update(self.screen)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    exit()
+                    running = False
+                    break
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.back_from_algorithm_button.check_for_input(pygame.mouse.get_pos()):
-                        return
+                        return        
 
             pygame.display.update()
+
+            if not running:
+                break

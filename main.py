@@ -28,7 +28,7 @@ def graph():
 
 @app.route('/maze')
 def maze():
-    subprocess.run(['C:/Users/Youssef/PycharmProjects/AI_Project/Maze/main.exe'], stdout=subprocess.PIPE)
+    subprocess.run(['Maze\Maze.exe'], stdout=subprocess.PIPE)
     return redirect(url_for('home'))
 
 

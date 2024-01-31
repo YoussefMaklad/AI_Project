@@ -1,11 +1,11 @@
 from flask import Flask, redirect, url_for, render_template, jsonify, request
-from flask_cors import CORS
+# from flask_cors import CORS
 from graph import Graph
 from collections import deque as queue
 import subprocess
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
 
 
 def convert_edges_to_tuples(edges):
@@ -15,6 +15,14 @@ def convert_edges_to_tuples(edges):
 def convert_edges_to_dict(edges):
     return {(edge["from"], edge["to"]): int(edge["label"]) for edge in edges}
 
+
+@app.after_request
+def enable_cors(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
+    return response
+    
 
 @app.route("/")
 def home():
